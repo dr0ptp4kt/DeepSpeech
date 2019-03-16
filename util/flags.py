@@ -55,6 +55,8 @@ def create_flags():
     tf.app.flags.DEFINE_integer ('inter_op_parallelism_threads', 0, 'number of inter-op parallelism threads - see tf.ConfigProto for more details')
     tf.app.flags.DEFINE_integer ('intra_op_parallelism_threads', 0, 'number of intra-op parallelism threads - see tf.ConfigProto for more details')
 
+    tf.app.flags.DEFINE_boolean ('use_cudnn_rnn',    False,       'use CuDNN RNN backend for training on GPU')
+
     # Sample limits
 
     tf.app.flags.DEFINE_integer ('limit_train',      0,           'maximum number of elements to use from train set - 0 means no limit')
@@ -90,6 +92,8 @@ def create_flags():
     # Geometry
 
     tf.app.flags.DEFINE_integer ('n_hidden',         2048,        'layer width to use when initialising layers')
+    tf.app.flags.DEFINE_integer ('n_layers',         1,           'number of recurrent layers')
+    tf.app.flags.DEFINE_string  ('rnn_cell',         'lstm',      'recurrent cell type, "lstm" or "gru"')
 
     # Initialization
 
