@@ -149,7 +149,6 @@ struct ModelState {
   int new_state_c_idx;
   int new_state_h_idx;
   int mfccs_idx;
-  int mfccs_len_idx;
 #endif
 
   ModelState();
@@ -164,7 +163,7 @@ struct ModelState {
    *
    * @return String representing the decoded text.
    */
-  char* decode(vector<float>& logits);
+  char* decode(const vector<float>& logits);
 
   /**
    * @brief Perform decoding of the logits, using basic CTC decoder or
@@ -186,7 +185,7 @@ struct ModelState {
    * @return Metadata struct containing MetadataItem structs for each character.
    * The user is responsible for freeing Metadata by calling DS_FreeMetadata().
    */
-  Metadata* decode_metadata(vector<float>& logits); 
+  Metadata* decode_metadata(const vector<float>& logits);
 
   /**
    * @brief Do a single inference step in the acoustic model, with:
@@ -202,9 +201,6 @@ struct ModelState {
 
   void compute_mfcc(const vector<float>& audio_buffer, vector<float>& mfcc_output);
 };
-
-StreamingState* SetupStreamAndFeedAudioContent(ModelState* aCtx, const short* aBuffer,
-                                               unsigned int aBufferSize, unsigned int aSampleRate);
 
 ModelState::ModelState()
   :
@@ -472,15 +468,15 @@ ModelState::compute_mfcc(const vector<float>& samples, vector<float>& mfcc_outpu
   }
 
   vector<Tensor> outputs;
-  Status status = session->Run({{"input_samples", input}}, {"mfccs", "mfccs_len"}, {}, &outputs);
+  Status status = session->Run({{"input_samples", input}}, {"mfccs"}, {}, &outputs);
 
   if (!status.ok()) {
     std::cerr << "Error running session: " << status << "\n";
     return;
   }
 
-  auto mfcc_len_mapped = outputs[1].flat<int32>();
-  int n_windows = mfcc_len_mapped(0);
+  // The feature computation graph is hardcoded to one audio length for now
+  int n_windows = 1;
 
   auto mfcc_mapped = outputs[0].flat<float>();
   for (int i = 0; i < n_windows * n_features; ++i) {
@@ -499,7 +495,8 @@ ModelState::compute_mfcc(const vector<float>& samples, vector<float>& mfcc_outpu
     return;
   }
 
-  int n_windows = *interpreter->typed_tensor<float>(mfccs_len_idx);
+  // The feature computation graph is hardcoded to one audio length for now
+  int n_windows = 1;
 
   float* outputs = interpreter->typed_tensor<float>(mfccs_idx);
   for (int i = 0; i < n_windows * n_features; ++i) {
@@ -509,10 +506,9 @@ ModelState::compute_mfcc(const vector<float>& samples, vector<float>& mfcc_outpu
 }
 
 char*
-ModelState::decode(vector<float>& logits)
+ModelState::decode(const vector<float>& logits)
 {
   vector<Output> out = ModelState::decode_raw(logits);
-
   return strdup(alphabet->LabelsToString(out[0].tokens).c_str());
 }
 
@@ -535,7 +531,8 @@ ModelState::decode_raw(const vector<float>& logits)
   return out;
 }
 
-Metadata* ModelState::decode_metadata(vector<float>& logits) 
+Metadata*
+ModelState::decode_metadata(const vector<float>& logits)
 {
   vector<Output> out = decode_raw(logits);
 
@@ -559,7 +556,8 @@ Metadata* ModelState::decode_metadata(vector<float>& logits)
 }
 
 #ifdef USE_TFLITE
-int tflite_get_tensor_by_name(const ModelState* ctx, const vector<int>& list, const char* name)
+int
+tflite_get_tensor_by_name(const ModelState* ctx, const vector<int>& list, const char* name)
 {
   int rv = -1;
 
@@ -574,12 +572,14 @@ int tflite_get_tensor_by_name(const ModelState* ctx, const vector<int>& list, co
   return rv;
 }
 
-int tflite_get_input_tensor_by_name(const ModelState* ctx, const char* name)
+int
+tflite_get_input_tensor_by_name(const ModelState* ctx, const char* name)
 {
   return ctx->interpreter->inputs()[tflite_get_tensor_by_name(ctx, ctx->interpreter->inputs(), name)];
 }
 
-int tflite_get_output_tensor_by_name(const ModelState* ctx, const char* name)
+int
+tflite_get_output_tensor_by_name(const ModelState* ctx, const char* name)
 {
   return ctx->interpreter->outputs()[tflite_get_tensor_by_name(ctx, ctx->interpreter->outputs(), name)];
 }
@@ -729,7 +729,6 @@ DS_CreateModel(const char* aModelPath,
   model->new_state_c_idx      = tflite_get_output_tensor_by_name(model.get(), "new_state_c");
   model->new_state_h_idx      = tflite_get_output_tensor_by_name(model.get(), "new_state_h");
   model->mfccs_idx            = tflite_get_output_tensor_by_name(model.get(), "mfccs");
-  model->mfccs_len_idx        = tflite_get_output_tensor_by_name(model.get(), "mfccs_len");
 
   TfLiteIntArray* dims_input_node = model->interpreter->tensor(model->input_node_idx)->dims;
 
@@ -790,41 +789,6 @@ DS_EnableDecoderWithLM(ModelState* aCtx,
   } catch (...) {
     return DS_ERR_INVALID_LM;
   }
-}
-
-char*
-DS_SpeechToText(ModelState* aCtx,
-                const short* aBuffer,
-                unsigned int aBufferSize,
-                unsigned int aSampleRate)
-{
-  StreamingState* ctx = SetupStreamAndFeedAudioContent(aCtx, aBuffer, aBufferSize, aSampleRate);
-  return DS_FinishStream(ctx);
-}
-
-Metadata*
-DS_SpeechToTextWithMetadata(ModelState* aCtx,
-                            const short* aBuffer,
-                            unsigned int aBufferSize,
-                            unsigned int aSampleRate)
-{
-  StreamingState* ctx = SetupStreamAndFeedAudioContent(aCtx, aBuffer, aBufferSize, aSampleRate);
-  return DS_FinishStreamWithMetadata(ctx);
-}
-
-StreamingState* 
-SetupStreamAndFeedAudioContent(ModelState* aCtx,
-                               const short* aBuffer,
-                               unsigned int aBufferSize,
-                               unsigned int aSampleRate)
-{
-  StreamingState* ctx;
-  int status = DS_SetupStream(aCtx, 0, aSampleRate, &ctx);
-  if (status != DS_ERR_OK) {
-    return nullptr;
-  }
-  DS_FeedAudioContent(ctx, aBuffer, aBufferSize);
-  return ctx;
 }
 
 int
@@ -897,6 +861,41 @@ DS_FinishStreamWithMetadata(StreamingState* aSctx)
   Metadata* metadata = aSctx->finishStreamWithMetadata();
   DS_DiscardStream(aSctx);
   return metadata;
+}
+
+StreamingState*
+SetupStreamAndFeedAudioContent(ModelState* aCtx,
+                               const short* aBuffer,
+                               unsigned int aBufferSize,
+                               unsigned int aSampleRate)
+{
+  StreamingState* ctx;
+  int status = DS_SetupStream(aCtx, 0, aSampleRate, &ctx);
+  if (status != DS_ERR_OK) {
+    return nullptr;
+  }
+  DS_FeedAudioContent(ctx, aBuffer, aBufferSize);
+  return ctx;
+}
+
+char*
+DS_SpeechToText(ModelState* aCtx,
+                const short* aBuffer,
+                unsigned int aBufferSize,
+                unsigned int aSampleRate)
+{
+  StreamingState* ctx = SetupStreamAndFeedAudioContent(aCtx, aBuffer, aBufferSize, aSampleRate);
+  return DS_FinishStream(ctx);
+}
+
+Metadata*
+DS_SpeechToTextWithMetadata(ModelState* aCtx,
+                            const short* aBuffer,
+                            unsigned int aBufferSize,
+                            unsigned int aSampleRate)
+{
+  StreamingState* ctx = SetupStreamAndFeedAudioContent(aCtx, aBuffer, aBufferSize, aSampleRate);
+  return DS_FinishStreamWithMetadata(ctx);
 }
 
 void
