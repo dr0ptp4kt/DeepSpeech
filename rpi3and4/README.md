@@ -1,5 +1,7 @@
 # Compiling DeepSpeech with TensorFlow Lite bindings for Raspberry Pi 4 or Raspberry Pi 3
 
+*The docs.json file in this directory uses English Wikipedia content, which was licensed under the [Creative Commons Attribution-ShareAlike License] (https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License)* 
+
 If you want to be able to create something like an [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) that runs on an inexpensive Raspberry Pi device, this tutoriala may be what you're looking for.
 
 The eventual target deployment device is a Raspberry Pi 4 or Raspberry Pi 3. For good performance and accuracy, use a Raspberry Pi 4 with 2 GB of RAM or more.
@@ -10,7 +12,7 @@ On my Raspberry Pi with 4GB of RAM this runs fast even when using the --lm and -
 
 Anyway, here it goes.
 
-0. On your computer configure Docker to use 10 GB of RAM if you can. I know that works on my Mac. It may be possible to get by with less like 8 GB or 4 GB or RAM, but I know 10 GB works for sure. The default 2GB of RAM will result in errors during build, so don't use the default. Now build the docker container from *this* directory where *this* README.md resides and run it!
+0. On your computer configure Docker to use 10 GB of RAM if you can. I know that works on my Mac. It may be possible to get by with less like 8 GB or 4 GB or RAM, but I know 10 GB works for sure. The default 2GB of RAM will result in errors during build, so don't use the default. Now build the docker container from **this** directory where **this** README.md resides and run it!
 
 ```bash
 docker build --tag deepspeech:rpi3and4 --file Dockerfile.rpi3and4 .
@@ -356,7 +358,7 @@ i2c-dev
 snd_bcm2835A
 ```
 
-Finally, I made a simple Bash script and Python script after fetching some text extracts from English Wikipedia's most read articles for the day. You'll see test-short.bash and lookout.py in the same directory as this README.
+Finally, I made a simple Bash script and Python script after fetching some text extracts from English Wikipedia's most read articles for the day. You'll see test-short.bash and lookout.py in the same directory as **this** README.md.
 
 ```
 curl -O docs.json "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&generator=mostviewed&exintro=1&explaintext=1&gpvimlimit=500"
