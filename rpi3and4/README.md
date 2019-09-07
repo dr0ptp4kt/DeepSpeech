@@ -305,7 +305,7 @@ Inference took 4.703s for 5.000s audio file.
 ```
 
 
-Notice how the inference is relatively fast. But it's still not quite what we got earlier. Let's see what happens now that we've warmed up the file system cache. To play it safer we'll make a copy of the wave file so that's still an independent variable.
+Notice how the loading of the language file was slow because the cache wasn't warmed up, but the inference is relatively fast. But the inference is still not quite what we got earlier. Let's see what happens now that we've warmed up the file system cache. To play it safer we'll make a copy of the wave file so that's still an independent variable.
 
 ```bash
 cp test.wav test.wav.copy.2
