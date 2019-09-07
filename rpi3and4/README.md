@@ -1,4 +1,6 @@
-# Compiling DeepSpeech with TensorFlow Lite bindings
+# Compiling DeepSpeech with TensorFlow Lite bindings for Raspberry Pi 4 or Raspberry Pi 3
+
+If you want to be able to create something like an [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) that runs on an inexpensive Raspberry Pi device, this tutoriala may be what you're looking for.
 
 The eventual target deployment device is a Raspberry Pi 4 or Raspberry Pi 3. For good performance and accuracy, use a Raspberry Pi 4 with 2 GB of RAM or more.
 
@@ -8,7 +10,7 @@ On my Raspberry Pi with 4GB of RAM this runs fast even when using the --lm and -
 
 Anyway, here it goes.
 
-0. Configure Docker to use 10 GB of RAM if you can. I know that works on my Mac. It may be possible to get by with less like 8 GB or 4 GB or RAM, but I know 10 GB works for sure. The default 2GB of RAM will result in errors during build, so don't use the default. Now build the docker container from *this* directory where *this* README.md resides and run it!
+0. On your computer configure Docker to use 10 GB of RAM if you can. I know that works on my Mac. It may be possible to get by with less like 8 GB or 4 GB or RAM, but I know 10 GB works for sure. The default 2GB of RAM will result in errors during build, so don't use the default. Now build the docker container from *this* directory where *this* README.md resides and run it!
 
 ```bash
 docker build --tag deepspeech:rpi3and4 --file Dockerfile.rpi3and4 .
@@ -179,6 +181,8 @@ Obtain the models and some audio. You may want to SCP the extracted files from y
 ```bash
 curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.5.1/deepspeech-0.5.1-models.tar.gz
 tar xvf deepspeech-0.5.1-models.tar.gz
+curl -LO https://github.com/mozilla/DeepSpeech/releases/download/v0.5.1/audio-0.5.1.tar.gz
+tar xvf audio-0.5.1.tar.gz
 ```
 
 In ~/ds run your tflite-linked deepspeech.
@@ -322,3 +326,41 @@ Inference took 3.598s for 5.000s audio file.
 ```
 
 Looks good. Have other ways to make this run faster?
+
+## Offline voice based Wikipedia example
+
+If you want to recreate the example from [offline voice based Wikipedia](http    s://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) you need to install a few more things on your Raspberry Pi 4. I was having problems with espeak so used the festival tool for a simple TTS option. Much more sophisticated options are of course possible.
+
+```bash
+sudo apt-get install alsa-utils festival
+```
+
+In my case I was using a 3.5mm speaker, so I had to  run raspi-config.
+
+```bash
+sudo raspi-config
+```
+
+I went to Advanced Options > Audio and set "Force 3.5mm ('headphone') jack" while plugged into a display so the audio wouldn't route to HDMI.
+
+I updated /etc/modules to make it play nicely. Here's what it looks like.
+
+```bash
+cat /etc/modules
+# /etc/modules: kernel modules to load at boot time.
+#
+# This file contains the names of kernel modules that should be loaded
+# at boot time, one per line. Lines beginning with "#" are ignored.
+
+i2c-dev
+snd_bcm2835A
+```
+
+Finally, I made a simple Bash script and Python script after fetching some text extracts from English Wikipedia's most read articles for the day. You'll see test-short.bash and lookout.py in the same directory as this README.
+
+```
+curl -O docs.json "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&generator=mostviewed&exintro=1&explaintext=1&gpvimlimit=500"
+bash test-short.bash
+```
+
+It would be easy enough to wire up native_client/python/client.py here to inject the language model so that the voice detection runs as fast as possible, but I wanted to just have this run simply for the demo.
