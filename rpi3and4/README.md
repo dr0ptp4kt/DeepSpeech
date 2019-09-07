@@ -2,7 +2,7 @@
 
 The docs.json file in this directory uses English Wikipedia content, which was licensed under the Creative Commons Attribution-ShareAlike License at https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License .
 
-If you want to be able to create something like an [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) that runs on an inexpensive Raspberry Pi device, this tutoriala may be what you're looking for.
+If you want to be able to create something like an [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) that runs on an inexpensive Raspberry Pi device, this tutorial may be what you're looking for.
 
 The eventual target deployment device is a Raspberry Pi 4 or Raspberry Pi 3. For good performance and accuracy, use a Raspberry Pi 4 with 2 GB of RAM or more.
 
