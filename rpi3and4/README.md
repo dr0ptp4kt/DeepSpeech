@@ -158,7 +158,7 @@ docker cp <container id>:/DeepSpeech/native_client/deepspeech .
 docker cp <container id>:/tensorflow/bazel-bin/native_client/libdeepspeech.so .
 docker cp <container id>:/tensorflow/bazel-bin/native_client/generate_trie .
 scp deepspeech pi@<host>:/deepspeech
-scp libdeepspeech pi@<host>:/libdeepspeech.so
+scp libdeepspeech.so pi@<host>:/libdeepspeech.so
 scp generate_trie pi@<host>:/generate_trie
 ```
 
@@ -311,7 +311,9 @@ Inference took 4.703s for 5.000s audio file.
 ```
 
 
-Notice how the loading of the language file was slow because the cache wasn't warmed up, but the inference is relatively fast. But the inference is still not quite what we got earlier. Let's see what happens now that we've warmed up the file system cache. To play it safer we'll make a copy of the wave file so that's still an independent variable.
+Notice how the loading of the language model was slow because the cache wasn't warmed up, but the inference is relatively fast. However, the inference speed is still not quite what we got earlier, it's a little over a second longer.
+
+Let's see what happens now that we've warmed up the file system cache for the model files. To play it safer we'll make a copy of the wave file so that's still an independent variable.
 
 ```bash
 cp test.wav test.wav.copy.2
