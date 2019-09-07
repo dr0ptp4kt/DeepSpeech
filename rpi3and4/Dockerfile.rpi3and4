@@ -1,0 +1,64 @@
+FROM ubuntu:18.04
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3.6 \
+        python3-venv \
+        libsox-dev \
+        pkg-config \
+        zip \
+        gzip \
+        g++ \
+        zlib1g-dev \
+        wget \
+        curl \
+        git \
+        multistrap \
+        vim \
+	debian-keyring \
+        gpg \
+        gpg-agent \
+        traceroute \
+        unzip \
+        crossbuild-essential-armhf
+
+
+
+RUN wget https://github.com/bazelbuild/bazel/releases/download/0.19.2/bazel-0.19.2-installer-linux-x86_64.sh
+RUN chmod +x bazel-0.19.2-installer-linux-x86_64.sh
+WORKDIR /
+RUN ./bazel-0.19.2-installer-linux-x86_64.sh
+
+WORKDIR /
+RUN git clone https://github.com/mozilla/DeepSpeech.git
+WORKDIR /DeepSpeech
+RUN git checkout v0.5.1
+
+WORKDIR /
+RUN git clone https://github.com/mozilla/tensorflow.git
+WORKDIR /tensorflow
+RUN git checkout origin/r1.13
+RUN ln -s ../DeepSpeech/native_client ./
+
+WORKDIR /
+RUN wget https://archive.raspbian.org/raspbian.public.key
+RUN apt-key add raspbian.public.key
+
+
+RUN echo >> /etc/apt/sources.list
+RUN echo >> /etc/apt/sources.list
+RUN echo "deb http://archive.raspbian.org/raspbian stretch main contrib non-free" >> /etc/apt/sources.list
+RUN echo "deb-src http://archive.raspbian.org/raspbian stretch main contrib non-free" >> /etc/apt/sources.list
+
+RUN apt-get update
+
+WORKDIR /tensorflow/native_client
+RUN mkdir -p msrs/etc/apt/
+RUN cp /etc/apt/trusted.gpg msrs/etc/apt/trusted.gpg
+RUN multistrap -f multistrap_raspbian_stretch.conf -d msrs --tidy-up
+
+
+RUN ln -s /usr/bin/python3.6 /usr/bin/python
+ENV PYTHON_BIN_PATH /usr/bin/python3.6
+ENV PYTHON_LIB_PATH /usr/lib/python3.6/dist-packages
+
+WORKDIR /tensorflow
