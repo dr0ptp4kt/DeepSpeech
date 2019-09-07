@@ -1,6 +1,6 @@
 # Compiling DeepSpeech with TensorFlow Lite bindings for Raspberry Pi 4 or Raspberry Pi 3
 
-*The docs.json file in this directory uses English Wikipedia content, which was licensed under the [Creative Commons Attribution-ShareAlike License] (https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License)* 
+The docs.json file in this directory uses English Wikipedia content, which was licensed under the [Creative Commons Attribution-ShareAlike License] (https://en.wikipedia.org/wiki/Wikipedia:Text_of_Creative_Commons_Attribution-ShareAlike_3.0_Unported_License).
 
 If you want to be able to create something like an [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) that runs on an inexpensive Raspberry Pi device, this tutoriala may be what you're looking for.
 
@@ -52,7 +52,7 @@ Not configuring the WORKSPACE for Android builds.
 ```
 
 
-2. In the running Docker instance, adapt the following files with the following diff. Do notice that /tensorflow has a sub-folder called tensorflow - don't get confused! This is just a workaround - a proper fix would be to adjust things with better logic flow in the make, Bazel and C++ files specifically for the architecture. I had been having some problems debugging the logic flow between all of the building so ended up taking the more expedient route just to get this proof of concept working.
+2. In the running Docker container, adapt the following files with the following diff. Do notice that /tensorflow has a sub-folder called tensorflow - don't get confused! This is just a workaround - a proper fix would be to adjust things with better logic flow in the make, Bazel and C++ files specifically for the architecture. I had been having some problems debugging the logic flow between all of the building so ended up taking the more expedient route just to get this proof of concept working.
 
 ```bash
 vi tensorflow/lite/kernels/internal/BUILD
@@ -220,7 +220,7 @@ user	0m3.740s
 sys	0m1.000s
 ```
 
-Now try a 5 second audio clip
+Now try a 5 second audio clip.
 
 ```bash
 time ./deepspeech --model deepspeech-0.5.1-models/output_graph.tflite --alphabet deepspeech-0.5.1-models/alphabet.txt --lm deepspeech-0.5.1-models/lm.binary --trie deepspeech-0.5.1-models/trie --audio test.wav
@@ -286,7 +286,7 @@ cp deepspeech-0.5.1-models/lm.binary deepspeech-0.5.1-models/lm.binary.copy
 Terrific. Keep in mind that the there's a filesystem cache. My obvervation is that you need to ensure you've run things once with the .tflite, .binary, and trie so that subsequent runs will be fast. The audio files and alphabet.txt file are really small, so the file system cache plays a neglibible role for those if you're trying to compare runs of a non-warmed up cache versus a warmed up cache. But for a real world application you do want to ensure you've run this once to warm up the file system cache on the big model files. Here's the evidence.
 
 
-First, the copy
+First, the copy.
 
 ```bash
 cp deepspeech-0.5.1-models/lm.binary deepspeech-0.5.1-models/lm.binary.copy
@@ -295,7 +295,7 @@ cp deepspeech-0.5.1-models/trie deepspeech-0.5.1-models/trie.copy
 cp test.wav test.wav.copy
 ```
 
-Now, the run with the copied files
+Now, the run with the copied files.
 
 ```bash
 python native_client/python/client.py --model deepspeech-0.5.1-models/output_graph.tflite.copy --alphabet deepspeech-0.5.1-models/alphabet.txt --lm deepspeech-0.5.1-models/lm.binary.copy --trie deepspeech-0.5.1-models/trie.copy --audio test.wav.copy
