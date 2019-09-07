@@ -329,7 +329,7 @@ Looks good. Have other ways to make this run faster?
 
 ## Offline voice based Wikipedia example
 
-If you want to recreate the example from [offline voice based Wikipedia](http    s://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) you need to install a few more things on your Raspberry Pi 4. I was having problems with espeak so used the festival tool for a simple TTS option. Much more sophisticated options are of course possible.
+If you want to recreate the example from [offline voice based Wikipedia](https://www.icloud.com/sharedalbum/#B0B5ON9t3uAsJR;12EB94FB-FA2D-401E-A7B5-895597BABEB9) you need to install a few more things on your Raspberry Pi 4. I was having problems with espeak so used the festival tool for a simple TTS option. Much more sophisticated options are of course possible.
 
 ```bash
 sudo apt-get install alsa-utils festival
