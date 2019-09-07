@@ -361,7 +361,7 @@ snd_bcm2835A
 Finally, I made a simple Bash script and Python script after fetching some text extracts from English Wikipedia's most read articles for the day. You'll see test-short.bash and lookout.py in the same directory as **this** README.md.
 
 ```
-curl -O docs.json "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&generator=mostviewed&exintro=1&explaintext=1&gpvimlimit=500"
+curl -O docs.json "https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&generator=mostviewed&exintro=1&explaintext=1&gpvimlimit=20"
 bash test-short.bash
 ```
 
