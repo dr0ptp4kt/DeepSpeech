@@ -6,7 +6,7 @@ If you want to be able to create something like an [offline voice based Wikipedi
 
 The eventual target deployment device is a Raspberry Pi 4 or Raspberry Pi 3. For good performance and accuracy, use a Raspberry Pi 4 with 2 GB of RAM or more.
 
-If you have a Raspberry Pi 3, which has only 1 GB or RAM, when you get to the end of this tutorial, if you want to get reasonable speed, you'll want to either produce and use a smaller lm.binary or execute the commands without the language model and trie (i.e., remove "--lm deepspeech-0.5.1-models/lm.binary.copy --trie deepspeech-0.5.1-models/trie.copy" from command invocation). You can fiddle with this to get the appropriate accuracy and speed of execution for your context.
+If you have a Raspberry Pi 3, which has only 1 GB of RAM, when you get to the end of this tutorial, if you want to get reasonable speed, you'll want to either produce and use a smaller lm.binary or execute the commands without the language model and trie (i.e., remove "--lm deepspeech-0.5.1-models/lm.binary.copy --trie deepspeech-0.5.1-models/trie.copy" from command invocation). You can fiddle with this to get the appropriate accuracy and speed of execution for your context.
 
 On my Raspberry Pi with 4GB of RAM this runs fast even when using the --lm and --trie flags. Without the --lm and --trie flags, on my Raspberry Pi 3 it takes about 21.9s to run using the stock .tflite model, which is much better than the 95s it takes with the --lm and --trie flags in use...but it would run even faster if I could fit the language model in RAM from what I can tell...a different project for a different day.
 
